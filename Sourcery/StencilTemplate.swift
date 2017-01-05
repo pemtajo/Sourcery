@@ -34,6 +34,11 @@ final class StencilTemplate: Stencil.Template, Template {
         ext.registerFilterWithArguments("hasPrefix", filter: Filter<String>.make({ $0.hasPrefix($1) }))
         ext.registerFilterWithArguments("hasSuffix", filter: Filter<String>.make({ $0.hasSuffix($1) }))
 
+        ext.registerFilter("camelCased", filter: Filter<String>.make({ $0.camelCased }))
+        ext.registerFilter("PascalCased", filter: Filter<String>.make({ $0.PascalCased }))
+        ext.registerFilter("snake_cased", filter: Filter<String>.make({ $0.snake_cased }))
+        ext.registerFilter("dottedNameToCamelCased", filter: Filter<String>.make({ $0.dottedNameToCamelCased }))
+
         ext.registerFilter("computed", filter: Filter<Variable>.make({ $0.isComputed && !$0.isStatic }))
         ext.registerFilter("stored", filter: Filter<Variable>.make({ !$0.isComputed && !$0.isStatic }))
         ext.registerFilter("tuple", filter: Filter<Variable>.make({ $0.isTuple }))
@@ -79,13 +84,49 @@ private func count(_ value: Any?) -> Any? {
 }
 
 extension String {
-
     fileprivate func upperFirst() -> String {
         let first = String(characters.prefix(1)).capitalized
         let other = String(characters.dropFirst())
         return first + other
     }
 
+    private var first: String {
+        return self.substring(to: self.index(self.startIndex, offsetBy: 1))
+    }
+
+    var camelCased: String {
+        if self.characters.contains(" ") {
+            let rest = String(self.capitalized.replacingOccurrences(of: " ", with: "").characters.dropFirst())
+            return "\(self.first.lowercased())\(rest)"
+        } else {
+            let rest = String(self.characters.dropFirst())
+            return "\(self.first.lowercased())\(rest)"
+        }
+    }
+
+    var PascalCased: String {
+        if self.characters.contains(" ") {
+            return self.capitalized.replacingOccurrences(of: " ", with: "")
+        } else {
+            let rest = String(self.characters.dropFirst())
+            return "\(self.first.uppercased())\(rest)"
+        }
+    }
+
+    var snake_cased: String {
+        if let regex = try? NSRegularExpression(pattern: "([A-Z])", options: []) {
+            let modString = regex.stringByReplacingMatches(in: self,
+                                                           options: .withTransparentBounds,
+                                                           range: NSMakeRange(0, self.characters.count),
+                                                           withTemplate: "_$1")
+            return modString.lowercased()
+        }
+        return self.replacingOccurrences(of: " ", with: "_").lowercased()
+    }
+
+    var dottedNameToCamelCased: String {
+        return String(self.characters.split(separator: ".").map { String($0).PascalCased }.joined()).camelCased
+    }
 }
 
 private struct Filter<T> {
