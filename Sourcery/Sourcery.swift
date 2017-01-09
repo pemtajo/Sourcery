@@ -14,7 +14,7 @@ import Foundation
 /// If you specify templatePath as a folder, it will create a Generated[TemplateName].swift file
 /// If you specify templatePath as specific file, it will put all generated results into that single file
 public class Sourcery {
-    public static let version: String = inUnitTests ? "Major.Minor.Patch" : "0.5.0"
+    public static let version: String = inUnitTests ? "Major.Minor.Patch" : "0.5.2"
     public static let generationMarker: String = "// Generated using Sourcery"
     public static let generationHeader = "\(Sourcery.generationMarker) \(Sourcery.version) — https://github.com/krzysztofzablocki/Sourcery\n"
         + "// DO NOT EDIT\n\n"
@@ -106,7 +106,7 @@ public class Sourcery {
 
         guard from.isDirectory else {
             let parserResult = try FileParser(verbose: verbose, path: from).parse()
-            return ParserComposer(verbose: verbose).uniqueTypes(parserResult)
+            return Composer(verbose: verbose).uniqueTypes(parserResult)
         }
 
         let sources = try from
@@ -129,7 +129,7 @@ public class Sourcery {
         }
 
         //! All files have been scanned, time to join extensions with base class
-        let types = ParserComposer(verbose: verbose).uniqueTypes(parserResult)
+        let types = Composer(verbose: verbose).uniqueTypes(parserResult)
 
         track("Found \(types.count) types.")
         return types
@@ -182,7 +182,11 @@ public class Sourcery {
 
     private func templates(from: Path) throws -> [Template] {
         return try templatePaths(from: from).map {
-                try StencilTemplate(path: $0)
+            if $0.extension == "swifttemplate" {
+                return try SwiftTemplate(path: $0)
+            } else {
+                return try StencilTemplate(path: $0)
+            }
         }
     }
 
@@ -204,7 +208,8 @@ public class Sourcery {
 
     private func track(_ message: Any, terminator: String = "\n", skipStatus: Bool = false) {
         if !watcherEnabled || verbose {
-            Swift.print(message, terminator: terminator)
+            //! console doesn't update in-place so always print on new line
+            Swift.print(message)
         }
 
         guard watcherEnabled && !skipStatus else { return }

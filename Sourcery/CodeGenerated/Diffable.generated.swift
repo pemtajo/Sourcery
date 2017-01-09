@@ -1,6 +1,20 @@
-// Generated using Sourcery 0.5.0 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 0.5.1 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
+extension Attribute: Diffable {
+    func diffAgainst(_ object: Any?) -> DiffableResult {
+        let results = DiffableResult()
+        guard let rhs = object as? Attribute else {
+            results.append("Incorrect type <expected: Attribute, received: \(type(of: object))>")
+            return results
+        }
+        results.append(contentsOf: DiffableResult(identifier: "name").trackDifference(actual: self.name, expected: rhs.name))
+        results.append(contentsOf: DiffableResult(identifier: "arguments").trackDifference(actual: self.arguments, expected: rhs.arguments))
+        results.append(contentsOf: DiffableResult(identifier: "_description").trackDifference(actual: self._description, expected: rhs._description))
+
+        return results
+    }
+}
 extension Class {
     override func diffAgainst(_ object: Any?) -> DiffableResult {
         let results = DiffableResult()
@@ -17,7 +31,7 @@ extension Enum {
             return results
         }
         results.append(contentsOf: DiffableResult(identifier: "cases").trackDifference(actual: self.cases, expected: rhs.cases))
-        results.append(contentsOf: DiffableResult(identifier: "rawType").trackDifference(actual: self.rawType, expected: rhs.rawType))
+        results.append(contentsOf: DiffableResult(identifier: "rawTypeName").trackDifference(actual: self.rawTypeName, expected: rhs.rawTypeName))
 
         results.append(contentsOf: super.diffAgainst(object))
         return results
@@ -52,6 +66,20 @@ extension Enum.Case.AssociatedValue: Diffable {
         return results
     }
 }
+extension GenerationContext: Diffable {
+    func diffAgainst(_ object: Any?) -> DiffableResult {
+        let results = DiffableResult()
+        guard let rhs = object as? GenerationContext else {
+            results.append("Incorrect type <expected: GenerationContext, received: \(type(of: object))>")
+            return results
+        }
+        results.append(contentsOf: DiffableResult(identifier: "types").trackDifference(actual: self.types, expected: rhs.types))
+        results.append(contentsOf: DiffableResult(identifier: "typeByName").trackDifference(actual: self.typeByName, expected: rhs.typeByName))
+        results.append(contentsOf: DiffableResult(identifier: "arguments").trackDifference(actual: self.arguments, expected: rhs.arguments))
+
+        return results
+    }
+}
 extension Method: Diffable {
     func diffAgainst(_ object: Any?) -> DiffableResult {
         let results = DiffableResult()
@@ -59,14 +87,15 @@ extension Method: Diffable {
             results.append("Incorrect type <expected: Method, received: \(type(of: object))>")
             return results
         }
-        results.append(contentsOf: DiffableResult(identifier: "parameters").trackDifference(actual: self.parameters, expected: rhs.parameters))
         results.append(contentsOf: DiffableResult(identifier: "selectorName").trackDifference(actual: self.selectorName, expected: rhs.selectorName))
+        results.append(contentsOf: DiffableResult(identifier: "parameters").trackDifference(actual: self.parameters, expected: rhs.parameters))
         results.append(contentsOf: DiffableResult(identifier: "returnTypeName").trackDifference(actual: self.returnTypeName, expected: rhs.returnTypeName))
         results.append(contentsOf: DiffableResult(identifier: "accessLevel").trackDifference(actual: self.accessLevel, expected: rhs.accessLevel))
         results.append(contentsOf: DiffableResult(identifier: "isStatic").trackDifference(actual: self.isStatic, expected: rhs.isStatic))
         results.append(contentsOf: DiffableResult(identifier: "isClass").trackDifference(actual: self.isClass, expected: rhs.isClass))
         results.append(contentsOf: DiffableResult(identifier: "isFailableInitializer").trackDifference(actual: self.isFailableInitializer, expected: rhs.isFailableInitializer))
         results.append(contentsOf: DiffableResult(identifier: "annotations").trackDifference(actual: self.annotations, expected: rhs.annotations))
+        results.append(contentsOf: DiffableResult(identifier: "attributes").trackDifference(actual: self.attributes, expected: rhs.attributes))
 
         return results
     }
@@ -146,6 +175,7 @@ extension Type: Diffable {
         results.append(contentsOf: DiffableResult(identifier: "inheritedTypes").trackDifference(actual: self.inheritedTypes, expected: rhs.inheritedTypes))
         results.append(contentsOf: DiffableResult(identifier: "containedTypes").trackDifference(actual: self.containedTypes, expected: rhs.containedTypes))
         results.append(contentsOf: DiffableResult(identifier: "parentName").trackDifference(actual: self.parentName, expected: rhs.parentName))
+        results.append(contentsOf: DiffableResult(identifier: "attributes").trackDifference(actual: self.attributes, expected: rhs.attributes))
 
         return results
     }
@@ -158,6 +188,7 @@ extension TypeName: Diffable {
             return results
         }
         results.append(contentsOf: DiffableResult(identifier: "name").trackDifference(actual: self.name, expected: rhs.name))
+        results.append(contentsOf: DiffableResult(identifier: "attributes").trackDifference(actual: self.attributes, expected: rhs.attributes))
         results.append(contentsOf: DiffableResult(identifier: "tuple").trackDifference(actual: self.tuple, expected: rhs.tuple))
 
         return results
@@ -191,6 +222,7 @@ extension Variable: Diffable {
         results.append(contentsOf: DiffableResult(identifier: "readAccess").trackDifference(actual: self.readAccess, expected: rhs.readAccess))
         results.append(contentsOf: DiffableResult(identifier: "writeAccess").trackDifference(actual: self.writeAccess, expected: rhs.writeAccess))
         results.append(contentsOf: DiffableResult(identifier: "annotations").trackDifference(actual: self.annotations, expected: rhs.annotations))
+        results.append(contentsOf: DiffableResult(identifier: "attributes").trackDifference(actual: self.attributes, expected: rhs.attributes))
 
         return results
     }

@@ -8,7 +8,7 @@ class VariableSpec: QuickSpec {
             var sut: Variable?
 
             beforeEach {
-                sut = Variable(name: "variable", typeName: "Int", accessLevel: (read: .public, write: .internal), isComputed: true)
+                sut = Variable(name: "variable", typeName: TypeName("Int"), accessLevel: (read: .public, write: .internal), isComputed: true)
             }
 
             afterEach {
@@ -23,63 +23,20 @@ class VariableSpec: QuickSpec {
                 expect(sut?.writeAccess == AccessLevel.internal.rawValue).to(beTrue())
             }
 
-            it("reports optional false") {
-                expect(sut?.isOptional).to(beFalse())
-            }
-
-            context("given optional type with short syntax") {
-                it("reports optional true") {
-                    expect(Variable(name: "Foo", typeName: "Int?").isOptional).to(beTrue())
-                }
-
-                it("reports non-optional type for unwrappedTypeName") {
-                    expect(Variable(name: "Foo", typeName: "Int?").unwrappedTypeName).to(equal("Int"))
-                }
-
-                it("can report optional via KVC") {
-                    let variable = Variable(name: "Foo", typeName: "Int?")
-
-                    expect(variable.value(forKeyPath: "isOptional") as? Bool).to(equal(true))
-                }
-            }
-
-            context("given optional type with long generic syntax") {
-                it("reports optional true") {
-                    expect(Variable(name: "Foo", typeName: "Optional<Int>").isOptional).to(beTrue())
-                }
-
-                it("reports non-optional type for unwrappedTypeName") {
-                    expect(Variable(name: "Foo", typeName: "Optional<Int>").unwrappedTypeName).to(equal("Int"))
-                }
-            }
-
-            describe("tuple type") {
-                it("reports tuple correctly") {
-                    expect(TypeName("(Int, Int)").isTuple).to(beTrue())
-                    expect(TypeName("(Int)").isTuple).to(beFalse())
-                    expect(TypeName("Int").isTuple).to(beFalse())
-                    expect(TypeName("(Int) -> (Int)").isTuple).to(beFalse())
-                    expect(TypeName("(Int, Int) -> (Int)").isTuple).to(beFalse())
-                    expect(TypeName("(Int, (Int, Int) -> (Int))").isTuple).to(beTrue())
-                    expect(TypeName("(Int, (Int, Int))").isTuple).to(beTrue())
-                    expect(TypeName("(Int, (Int) -> (Int -> Int))").isTuple).to(beTrue())
-                }
-            }
-
             describe("When testing equality") {
                 context("given same items") {
                     it("is equal") {
-                        expect(sut).to(equal(Variable(name: "variable", typeName: "Int", accessLevel: (read: .public, write: .internal), isComputed: true)))
+                        expect(sut).to(equal(Variable(name: "variable", typeName: TypeName("Int"), accessLevel: (read: .public, write: .internal), isComputed: true)))
                     }
                 }
 
                 context("given different items") {
                     it("is not equal") {
-                        expect(sut).toNot(equal(Variable(name: "other", typeName: "Int", accessLevel: (read: .public, write: .internal), isComputed: true)))
-                        expect(sut).toNot(equal(Variable(name: "variable", typeName: "Float", accessLevel: (read: .public, write: .internal), isComputed: true)))
-                        expect(sut).toNot(equal(Variable(name: "other", typeName: "Int", accessLevel: (read: .internal, write: .internal), isComputed: true)))
-                        expect(sut).toNot(equal(Variable(name: "other", typeName: "Int", accessLevel: (read: .public, write: .public), isComputed: true)))
-                        expect(sut).toNot(equal(Variable(name: "other", typeName: "Int", accessLevel: (read: .public, write: .internal), isComputed: false)))
+                        expect(sut).toNot(equal(Variable(name: "other", typeName: TypeName("Int"), accessLevel: (read: .public, write: .internal), isComputed: true)))
+                        expect(sut).toNot(equal(Variable(name: "variable", typeName: TypeName("Float"), accessLevel: (read: .public, write: .internal), isComputed: true)))
+                        expect(sut).toNot(equal(Variable(name: "other", typeName: TypeName("Int"), accessLevel: (read: .internal, write: .internal), isComputed: true)))
+                        expect(sut).toNot(equal(Variable(name: "other", typeName: TypeName("Int"), accessLevel: (read: .public, write: .public), isComputed: true)))
+                        expect(sut).toNot(equal(Variable(name: "other", typeName: TypeName("Int"), accessLevel: (read: .public, write: .internal), isComputed: false)))
                     }
                 }
             }

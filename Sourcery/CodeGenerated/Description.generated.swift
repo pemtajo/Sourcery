@@ -1,12 +1,12 @@
-// Generated using Sourcery 0.5.0 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 0.5.1 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 extension Enum {
     override var description: String {
         var string = super.description
         string += "cases = \(cases), "
-        string += "rawType = \(rawType), "
-        string += "hasAssociatedValues = \(hasAssociatedValues), "
+        string += "rawTypeName = \(rawTypeName), "
+        string += "hasAssociatedValues = \(hasAssociatedValues)"
         return string
     }
 }
@@ -18,7 +18,7 @@ extension Enum.Case {
         string += "rawValue = \(rawValue), "
         string += "associatedValues = \(associatedValues), "
         string += "annotations = \(annotations), "
-        string += "hasAssociatedValue = \(hasAssociatedValue), "
+        string += "hasAssociatedValue = \(hasAssociatedValue)"
         return string
     }
 }
@@ -28,7 +28,7 @@ extension Enum.Case.AssociatedValue {
         var string = "\(type(of: self)): "
         string += "localName = \(localName), "
         string += "externalName = \(externalName), "
-        string += "typeName = \(typeName), "
+        string += "typeName = \(typeName)"
         return string
     }
 }
@@ -46,6 +46,7 @@ extension Method {
         string += "isInitializer = \(isInitializer), "
         string += "isFailableInitializer = \(isFailableInitializer), "
         string += "annotations = \(annotations), "
+        string += "attributes = \(attributes)"
         return string
     }
 }
@@ -57,6 +58,7 @@ extension Method.Parameter {
         string += "name = \(name), "
         string += "typeName = \(typeName), "
         string += "type = \(type), "
+        string += "typeAttributes = \(typeAttributes)"
         return string
     }
 }
@@ -65,7 +67,7 @@ extension TupleType {
     override var description: String {
         var string = "\(type(of: self)): "
         string += "name = \(name), "
-        string += "elements = \(elements), "
+        string += "elements = \(elements)"
         return string
     }
 }
@@ -74,7 +76,7 @@ extension TupleType.Element {
     override var description: String {
         var string = "\(type(of: self)): "
         string += "name = \(name), "
-        string += "typeName = \(typeName), "
+        string += "typeName = \(typeName)"
         return string
     }
 }
@@ -100,6 +102,7 @@ extension Type {
         string += "inheritedTypes = \(inheritedTypes), "
         string += "containedTypes = \(containedTypes), "
         string += "parentName = \(parentName), "
+        string += "attributes = \(attributes)"
         return string
     }
 }
@@ -110,7 +113,7 @@ extension Typealias {
         string += "aliasName = \(aliasName), "
         string += "typeName = \(typeName), "
         string += "parentName = \(parentName), "
-        string += "name = \(name), "
+        string += "name = \(name)"
         return string
     }
 }
@@ -125,6 +128,7 @@ extension Variable {
         string += "readAccess = \(readAccess), "
         string += "writeAccess = \(writeAccess), "
         string += "annotations = \(annotations), "
+        string += "attributes = \(attributes)"
         return string
     }
 }

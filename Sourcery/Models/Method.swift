@@ -3,9 +3,9 @@ import Foundation
 //typealias used to avoid types ambiguty in tests
 typealias SourceryMethod = Method
 
-final class Method: NSObject, AutoDiffable {
+final class Method: NSObject, AutoDiffable, Annotated, NSCoding {
 
-    class Parameter: NSObject, AutoDiffable, Typed {
+    final class Parameter: NSObject, AutoDiffable, Typed, NSCoding {
         /// Parameter external name
         var argumentLabel: String
 
@@ -18,12 +18,40 @@ final class Method: NSObject, AutoDiffable {
         /// Actual parameter type, if known
         var type: Type?
 
-        init(argumentLabel: String? = nil, name: String, typeName: String) {
-            self.typeName = TypeName(typeName)
+        var typeAttributes: [String: Attribute] { return typeName.attributes }
+
+        /// Underlying parser data, never to be used by anything else
+        // sourcery: skipEquality, skipDescription, skipCoding
+        internal var __parserData: Any?
+
+        init(argumentLabel: String? = nil, name: String = "", typeName: TypeName) {
+            self.typeName = typeName
             self.argumentLabel = argumentLabel ?? name
             self.name = name
         }
+
+        // Method.Parameter.NSCoding {
+        required init?(coder aDecoder: NSCoder) {
+            guard let argumentLabel: String = aDecoder.decode(forKey: "argumentLabel") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["argumentLabel"])); fatalError() }; self.argumentLabel = argumentLabel
+            guard let name: String = aDecoder.decode(forKey: "name") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["name"])); fatalError() }; self.name = name
+            guard let typeName: TypeName = aDecoder.decode(forKey: "typeName") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["typeName"])); fatalError() }; self.typeName = typeName
+            self.type = aDecoder.decode(forKey: "type")
+
+        }
+
+        func encode(with aCoder: NSCoder) {
+
+            aCoder.encode(self.argumentLabel, forKey: "argumentLabel")
+            aCoder.encode(self.name, forKey: "name")
+            aCoder.encode(self.typeName, forKey: "typeName")
+            aCoder.encode(self.type, forKey: "type")
+
+        }
+        // } Method.Parameter.NSCoding
     }
+
+    /// Method name including arguments names, i.e. `foo(bar:)`
+    let selectorName: String
 
     /// All method parameters
     var parameters: [Parameter]
@@ -32,9 +60,6 @@ final class Method: NSObject, AutoDiffable {
     var shortName: String {
         return selectorName.range(of: "(").map({ selectorName.substring(to: $0.lowerBound) }) ?? selectorName
     }
-
-    /// Method name including arguments names, i.e. `foo(bar:)`
-    let selectorName: String
 
     /// Name of the return type
     var returnTypeName: TypeName
@@ -49,6 +74,12 @@ final class Method: NSObject, AutoDiffable {
     // sourcery: skipDescription
     var isOptionalReturnType: Bool {
         return returnTypeName.isOptional || isFailableInitializer
+    }
+
+    // sourcery: skipEquality
+    // sourcery: skipDescription
+    var isImplicitlyUnwrappedOptionalReturnType: Bool {
+        return returnTypeName.isImplicitlyUnwrappedOptional
     }
 
     // sourcery: skipEquality
@@ -77,27 +108,61 @@ final class Method: NSObject, AutoDiffable {
     /// Annotations, that were created with // sourcery: annotation1, other = "annotation value", alterantive = 2
     let annotations: [String: NSObject]
 
+    let attributes: [String: Attribute]
+
     /// Underlying parser data, never to be used by anything else
-    // sourcery: skipEquality, skipDescription
+    // sourcery: skipEquality, skipDescription, skipCoding
     internal var __parserData: Any?
 
     init(selectorName: String,
          parameters: [Parameter] = [],
-         returnTypeName: String = "Void",
+         returnTypeName: TypeName = TypeName("Void"),
          accessLevel: AccessLevel = .internal,
          isStatic: Bool = false,
          isClass: Bool = false,
          isFailableInitializer: Bool = false,
+         attributes: [String: Attribute] = [:],
          annotations: [String: NSObject] = [:]) {
 
         self.selectorName = selectorName
         self.parameters = parameters
-        self.returnTypeName = TypeName(returnTypeName)
+        self.returnTypeName = returnTypeName
         self.accessLevel = accessLevel
         self.isStatic = isStatic
         self.isClass = isClass
         self.isFailableInitializer = isFailableInitializer
+        self.attributes = attributes
         self.annotations = annotations
     }
 
+    // Method.NSCoding {
+        required init?(coder aDecoder: NSCoder) {
+            guard let selectorName: String = aDecoder.decode(forKey: "selectorName") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["selectorName"])); fatalError() }; self.selectorName = selectorName
+            guard let parameters: [Parameter] = aDecoder.decode(forKey: "parameters") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["parameters"])); fatalError() }; self.parameters = parameters
+            guard let returnTypeName: TypeName = aDecoder.decode(forKey: "returnTypeName") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["returnTypeName"])); fatalError() }; self.returnTypeName = returnTypeName
+            self.returnType = aDecoder.decode(forKey: "returnType")
+            guard let accessLevel: AccessLevel = aDecoder.decode(forKey: "accessLevel") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["accessLevel"])); fatalError() }; self.accessLevel = accessLevel
+            self.isStatic = aDecoder.decode(forKey: "isStatic")
+            self.isClass = aDecoder.decode(forKey: "isClass")
+            self.isFailableInitializer = aDecoder.decode(forKey: "isFailableInitializer")
+            guard let annotations: [String: NSObject] = aDecoder.decode(forKey: "annotations") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["annotations"])); fatalError() }; self.annotations = annotations
+            guard let attributes: [String: Attribute] = aDecoder.decode(forKey: "attributes") else { NSException.raise(NSExceptionName.parseErrorException, format: "Key '%@' not found.", arguments: getVaList(["attributes"])); fatalError() }; self.attributes = attributes
+
+        }
+
+        func encode(with aCoder: NSCoder) {
+
+            aCoder.encode(self.selectorName, forKey: "selectorName")
+            aCoder.encode(self.parameters, forKey: "parameters")
+            aCoder.encode(self.returnTypeName, forKey: "returnTypeName")
+            aCoder.encode(self.returnType, forKey: "returnType")
+            aCoder.encode(self.accessLevel, forKey: "accessLevel")
+            aCoder.encode(self.isStatic, forKey: "isStatic")
+            aCoder.encode(self.isClass, forKey: "isClass")
+            aCoder.encode(self.isFailableInitializer, forKey: "isFailableInitializer")
+            aCoder.encode(self.annotations, forKey: "annotations")
+            aCoder.encode(self.attributes, forKey: "attributes")
+
+        }
+        // } Method.NSCoding
 }
