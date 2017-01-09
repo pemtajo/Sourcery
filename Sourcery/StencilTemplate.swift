@@ -38,6 +38,7 @@ final class StencilTemplate: Stencil.Template, Template {
         ext.registerFilter("PascalCased", filter: Filter<String>.make({ $0.PascalCased }))
         ext.registerFilter("snake_cased", filter: Filter<String>.make({ $0.snake_cased }))
         ext.registerFilter("dottedNameToCamelCased", filter: Filter<String>.make({ $0.dottedNameToCamelCased }))
+        ext.registerFilter("undotted", filter: Filter<String>.make({ $0.undotted }))
 
         ext.registerFilter("computed", filter: Filter<Variable>.make({ $0.isComputed && !$0.isStatic }))
         ext.registerFilter("stored", filter: Filter<Variable>.make({ !$0.isComputed && !$0.isStatic }))
@@ -126,6 +127,10 @@ extension String {
 
     var dottedNameToCamelCased: String {
         return String(self.characters.split(separator: ".").map { String($0).PascalCased }.joined()).camelCased
+    }
+
+    var undotted: String {
+        return self.replacingOccurrences(of: ".", with: "")
     }
 }
 
