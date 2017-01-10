@@ -91,6 +91,10 @@ class Type: NSObject, AutoDiffable, Annotated, NSCoding {
         return variables.filter { !$0.isComputed && !$0.isStatic }
     }
 
+    var nonOptionalVariables: [Variable] {
+        return variables.filter { !$0.isOptional }
+    }
+
     /// Types / Protocols names we inherit from, in order of definition
     var inheritedTypes: [String] {
         didSet {
