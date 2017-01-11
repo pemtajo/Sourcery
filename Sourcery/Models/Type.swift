@@ -95,6 +95,21 @@ class Type: NSObject, AutoDiffable, Annotated, NSCoding {
         return variables.filter { !$0.isOptional }
     }
 
+    var variablesGroupedByType: [[Variable]] {
+        var typesDict = [String: [Variable]]()
+        variables.forEach {
+            var arr = typesDict[$0.typeName.name] ?? []
+            arr.append($0)
+            typesDict[$0.typeName.name] = arr
+        }
+
+        var out = [[Variable]]()
+        typesDict.values.forEach {
+            out.append($0)
+        }
+        return out
+    }
+
     /// Types / Protocols names we inherit from, in order of definition
     var inheritedTypes: [String] {
         didSet {
