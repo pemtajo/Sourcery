@@ -14,6 +14,15 @@ final class Variable: NSObject, AutoDiffable, Typed, Annotated, NSCoding {
     /// Variable type name
     var typeName: TypeName
 
+    // Type.name without ? and []
+    var strippedName: String {
+        return self.type?.name
+          .replacingOccurrences(of: "?", with: "Opt")
+          .replacingOccurrences(of: "[", with: "")
+          .replacingOccurrences(of: "]", with: "Arr") ?? ""
+    }
+
+
     /// sourcery: skipEquality
     /// sourcery: skipDescription
     var type: Type?
