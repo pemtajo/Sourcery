@@ -15,13 +15,26 @@ final class Variable: NSObject, AutoDiffable, Typed, Annotated, NSCoding {
     var typeName: TypeName
 
     // Type.name without ? and []
-    var strippedName: String {
-        return self.type?.name
+    var explainedName: String {
+        return self.typeName.name
           .replacingOccurrences(of: "?", with: "Opt")
           .replacingOccurrences(of: "[", with: "")
-          .replacingOccurrences(of: "]", with: "Arr") ?? ""
+          .replacingOccurrences(of: "]", with: "Arr")
     }
 
+    static let builtInTypes = [
+      "Int",
+      "String",
+      "Float",
+      "Date",
+      "Decimal",
+      "Double",
+      "Href"
+    ].flatMap { [$0, "[\($0)]", "\($0)?"] }
+
+    var isBuiltInType: Bool {
+        return Variable.builtInTypes.contains(self.typeName.name)
+    }
 
     /// sourcery: skipEquality
     /// sourcery: skipDescription
